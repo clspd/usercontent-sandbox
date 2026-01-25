@@ -20,5 +20,6 @@ export default defineConfig({
         manifest: true,
         sourcemap: true,
         emptyOutDir: true,
+        outDir: '../web/sandbox',
     },
 })
