@@ -9,9 +9,10 @@
     const host_prefix = hostname.slice(0, hostname.length - HOST_BASE.length);
     if (!host_prefix || host_prefix === 'www.') {
         if (isEmbedded) {
-            // Randomly pick a subdomain for embedding
-            const random_subdomain = window.crypto.randomUUID().replace(/-/g, '');
-            window.location.href = `https://${random_subdomain}.${HOST_BASE}/usercontent.html#${pathname}`;
+            // // Randomly pick a subdomain for embedding
+            // const random_subdomain = window.crypto.randomUUID().replace(/-/g, '');
+            const r = (Math.random() * 1e10) % 10; // 0-9
+            window.location.href = `https://public${r}.${HOST_BASE}/usercontent.html#${pathname}`;
         }
         else {
             window.location.href = `https://${HOST_BASE}/frontend/#${pathname}`;

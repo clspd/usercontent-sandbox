@@ -1,4 +1,8 @@
+import { setupEventHandlers } from "./message.js";
+
 export async function main() {
-    console.log("Hello World!");
+    setupEventHandlers();
+
+    console.log('[usercontent]', 'load success');
 }
 
