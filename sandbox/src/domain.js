@@ -1,5 +1,4 @@
 import { HOST_BASE, TRUSTED_ORIGINS } from '../../web/config.js';
-import { hexlify } from './binascii.js';
 import sha256 from './sha256.js';
 export const hostname = window.location.hostname;
 export const isCorrectHostname = hostname.endsWith(HOST_BASE);
@@ -20,7 +19,7 @@ export async function getDomainHash(domainName) {
     if (cachedDomainName2Hash.has(domainName)) {
         return cachedDomainName2Hash.get(domainName);
     }
-    const hash = hexlify(await sha256(domainName)).substring(0, 32);
+    const hash = (await sha256(domainName)).substring(0, 32);
     cachedDomainName2Hash.set(domainName, hash);
     return hash;
 }
