@@ -1,0 +1,25 @@
+{
+  "name": "usercontent-sandbox",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "postinstall": "only-allow pnpm && pnpm run install:deps",
+    "install:deps:frontend": "cd frontend && pnpm install",
+    "install:deps:sandbox": "cd sandbox && pnpm install",
+    "install:deps": "pnpm run install:deps:frontend && pnpm run install:deps:sandbox",
+    "build": "pnpm run build:frontend && pnpm run build:sandbox",
+    "build:frontend": "cd frontend && pnpm run build",
+    "build:sandbox": "cd sandbox && pnpm run build",
+    "start": "echo No command specified && exit 1",
+    "dev": "cd web && python -m http.server 5173"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "GPL-3.0",
+  "packageManager": "pnpm@10.28.1",
+  "devDependencies": {
+    "only-allow": "^1.2.2"
+  }
+}
