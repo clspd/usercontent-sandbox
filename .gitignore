@@ -36,5 +36,4 @@ coverage
 __screenshots__/
 
 # Project-specific files
-web/frontend/
 web/sandbox/

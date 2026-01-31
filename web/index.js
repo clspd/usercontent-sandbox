@@ -1,5 +1,5 @@
 ((async function () {
-    const { HOST_BASE } = await import('./config.js');
+    const { HOST_BASE } = await (await fetch('./config.json')).json();
     const { hostname, pathname } = window.location;
     if (!hostname.endsWith(HOST_BASE)) {
         window.document.body.appendChild(window.document.createElement('h1')).innerHTML = "Error: Invalid Hostname";

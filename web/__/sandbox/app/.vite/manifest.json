@@ -1,0 +1,56 @@
+{
+  "_config-B0WMfqV1.js": {
+    "file": "config-B0WMfqV1.js",
+    "name": "config"
+  },
+  "_domain-B9LIe2WW.js": {
+    "file": "domain-B9LIe2WW.js",
+    "name": "domain",
+    "imports": [
+      "_config-B0WMfqV1.js"
+    ]
+  },
+  "src/main.ts": {
+    "file": "main.mKq-14gM.js",
+    "name": "main",
+    "src": "src/main.ts",
+    "isEntry": true,
+    "imports": [
+      "_config-B0WMfqV1.js"
+    ],
+    "dynamicImports": [
+      "src/usercontent/message.js",
+      "src/swAvailable.ts",
+      "src/management/message.js"
+    ]
+  },
+  "src/management/message.js": {
+    "file": "message-Yw71ooiU.js",
+    "name": "message",
+    "src": "src/management/message.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_domain-B9LIe2WW.js",
+      "_config-B0WMfqV1.js"
+    ],
+    "dynamicImports": [
+      "src/swAvailable.ts"
+    ]
+  },
+  "src/swAvailable.ts": {
+    "file": "swAvailable-d6UGXR_1.js",
+    "name": "swAvailable",
+    "src": "src/swAvailable.ts",
+    "isDynamicEntry": true
+  },
+  "src/usercontent/message.js": {
+    "file": "message-5nFyMq3S.js",
+    "name": "message",
+    "src": "src/usercontent/message.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_domain-B9LIe2WW.js",
+      "_config-B0WMfqV1.js"
+    ]
+  }
+}
