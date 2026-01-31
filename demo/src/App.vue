@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 const code = ref('');
 const appmode = ref('private');
 const result = ref('');
-const random = ref('12345678');
+const random = ref('12345678'), randomBuffer = ref('12345678');
 const frame = ref<HTMLIFrameElement | null>(null);
 const originHash = ref('');
 
@@ -41,10 +41,37 @@ const config = reactive({
 })
 
 const isRunning = ref(false), isSuccess = ref(true);
+const showFrame = ref(false);
 
 onMounted(() => { 
     window.addEventListener('message', handleMessage);
 })
+
+watch(() => random.value, (newValue) => {
+    randomBuffer.value = newValue;
+});
+
+const updateRandom = () => {
+    // 63 是域名每一个部分（. 分隔）的最大长度
+    // 1 是 - 分隔符
+    // originHash.value 是 32 个字符
+    // 因此 randomBuffer.value 最多只能有 63 - 1 - 32 = 30 个字符
+    if (!randomBuffer.value || randomBuffer.value.length > (63 - 1 - originHash.value.length)) { 
+        randomBuffer.value = random.value;
+        return;
+    }
+    random.value = randomBuffer.value;
+}
+
+
+
+const copyResult = async () => {
+    try {
+        await navigator.clipboard.writeText(String(result.value));
+    } catch (error) {
+        alert('Failed to copy:' + error);
+    }
+};
 
 const handleMessage = (event: MessageEvent) => {
     if (event.origin !== frameorigin.value) return;
@@ -61,6 +88,20 @@ const handleMessage = (event: MessageEvent) => {
 const execcode = async () => {
     try {
         isRunning.value = true;
+
+        // 先测试ping是否正常
+        await new Promise<void>((resolve, reject) => {
+            setTimeout(() => (reject(new Error('Timeout: Ping failed\nIt seems that the sandbox is not connected. Please try to refresh the page.')), window.removeEventListener('message', handleMessage)), 5000);
+            function handleMessage(event: MessageEvent) {
+                if (event.origin !== frameorigin.value) return;
+                if (event.data.type !== 'pong') return;
+                resolve();
+                window.removeEventListener('message', handleMessage);
+            }
+            window.addEventListener('message', handleMessage);
+            // @ts-expect-error
+            frame.value.contentWindow.postMessage({ type: 'ping' }, frameorigin.value);
+        });
 
         // @ts-expect-error
         frame.value.contentWindow.postMessage({
@@ -86,7 +127,7 @@ const execcode = async () => {
 
         <div class="random-prefix" v-if="appmode === 'private'">
             <b>Random prefix:&nbsp;</b>
-            <input v-model="random" type="text" readonly>
+            <input v-model="randomBuffer" type="text" @blur="updateRandom" @keyup.enter="updateRandom">
             <button @click="random = Math.random().toString(36).substring(2, 10)">Randomalize</button>
         </div>
 
@@ -107,11 +148,16 @@ const execcode = async () => {
             <button @click="result = ''">Clear</button>
             <div class="result">
                 <b>Result:</b>
-                <pre :data-err="!isSuccess" style="white-space: pre-wrap; max-height: 300px; overflow: auto;">{{ String(result) }}</pre>
+                <pre :data-err="!isSuccess">{{ String(result) }}</pre>
+                <button @click="copyResult" :disabled="!result">Copy</button>
             </div>
         </div>
 
-        <iframe :src="framesrc" class="myframe" ref="frame"></iframe>
+        <div class="frame-toggle">
+            <label><input type="checkbox" v-model="showFrame"> Show iframe</label>
+        </div>
+
+        <iframe v-if="originHash" :src="framesrc" class="myframe" :class="{ 'myframe-visible': showFrame }" ref="frame"></iframe>
     </div>
 </template>
 
@@ -149,6 +195,7 @@ const execcode = async () => {
     display: flex;
     align-items: center;
     gap: 12px;
+    /* white-space: nowrap; */
 }
 
 .random-prefix input {
@@ -181,7 +228,7 @@ const execcode = async () => {
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     padding: 12px;
-    min-height: 200px;
+    min-height: 300px;
 }
 
 .input-code b {
@@ -274,7 +321,7 @@ const execcode = async () => {
     font-family: monospace;
     font-size: 13px;
     white-space: pre-wrap;
-    max-height: 300px;
+    word-break: break-all;
     overflow: auto;
 }
 
@@ -284,7 +331,48 @@ const execcode = async () => {
     background: #fef2f2;
 }
 
+.result button {
+    padding: 6px 16px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.result button:hover:not(:disabled) {
+    background: #2563eb;
+}
+
+.result button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.frame-toggle {
+    padding: 12px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.frame-toggle label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
 .myframe {
     display: none;
+    width: 100%;
+    height: 400px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.myframe-visible {
+    display: block;
 }
 </style>
