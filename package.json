@@ -5,11 +5,13 @@
   "type": "module",
   "scripts": {
     "postinstall": "only-allow pnpm && pnpm run install:deps",
-    "install:deps": "exit 0",
+    "install:deps": "pnpm run install:demo",
+    "install:demo": "cd demo && pnpm install",
     "dev": "vite --port 5173",
-    "build": "pnpm run build-only && pnpm run build:ucs-runtime",
+    "build": "pnpm run build-only && pnpm run build:ucs-runtime && pnpm run build:demo",
     "build-only": "tsc && vite build",
     "build:ucs-runtime": "vite build --mode ucs-runtime",
+    "build:demo": "cd demo && pnpm run build",
     "preview": "vite preview"
   },
   "devDependencies": {

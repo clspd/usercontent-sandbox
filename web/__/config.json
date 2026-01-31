@@ -1,6 +1,6 @@
 {
     "AUTO_REGISTER": false,
     "HOST_BASE": "usercontent.clspd.top",
-    "USERCODE_PLATFORM": "codebox.clspd.top",
+    "USERCODE_PLATFORM": "usercontent.clspd.top/demo",
     "TRUSTED_ORIGINS": []
 }
