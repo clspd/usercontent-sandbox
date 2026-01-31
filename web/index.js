@@ -1,5 +1,5 @@
 ((async function () {
-    const { HOST_BASE } = await (await fetch('./config.json')).json();
+    const { HOST_BASE, USERCODE_PLATFORM } = await (await fetch('/__/config.json')).json();
     const { hostname, pathname } = window.location;
     if (!hostname.endsWith(HOST_BASE)) {
         window.document.body.appendChild(window.document.createElement('h1')).innerHTML = "Error: Invalid Hostname";
@@ -15,7 +15,7 @@
             window.location.href = `https://public${r}.${HOST_BASE}/usercontent.html#${pathname}`;
         }
         else {
-            window.location.href = `https://${HOST_BASE}/frontend/#${pathname}`;
+            window.location.href = `https://${USERCODE_PLATFORM}/#${pathname}`;
         }
         return;
     }

@@ -1,6 +1,6 @@
-((async function() {
-    const manifest = await (await fetch('/__/sandbox/runtime/.vite/manifest.json', { cache: 'no-cache' })).json();
+((async function () {
+    const mainfile = await (await fetch('/__/sandbox/runtime/mainfile.txt', { cache: 'no-cache' })).text();
     const script = document.createElement('script');
-    script.src = `/__/sandbox/${manifest['src/ucs-runtime.ts'].file}`;
+    script.src = `/__/sandbox/runtime/${mainfile}`;
     document.head.append(script);
 })());

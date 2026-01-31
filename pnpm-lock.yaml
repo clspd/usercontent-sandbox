@@ -11,6 +11,9 @@ importers:
 
   .:
     devDependencies:
+      esbuild:
+        specifier: 0.25.12
+        version: 0.25.12
       only-allow:
         specifier: ^1.2.2
         version: 1.2.2
@@ -661,7 +664,6 @@ snapshots:
       '@esbuild/win32-arm64': 0.25.12
       '@esbuild/win32-ia32': 0.25.12
       '@esbuild/win32-x64': 0.25.12
-    optional: true
 
   fdir@6.5.0(picomatch@4.0.3):
     optionalDependencies:

@@ -1,4 +1,3 @@
-import { AUTO_REGISTER } from '../web/config.json' with { type: 'json' };
 
 export async function usercontent_main() {
     const { setupEventHandlers } = await import("./usercontent/message.js");
@@ -9,6 +8,7 @@ export async function usercontent_main() {
 
 
 export async function main() {
+    const { AUTO_REGISTER } = await (await fetch('/__/config.json')).json();
     const { serviceWorkerAvailable } = await import('./swAvailable.ts');
     if (serviceWorkerAvailable() && AUTO_REGISTER) {
         navigator.serviceWorker.register("/__service_worker__.js", { scope: "/" })

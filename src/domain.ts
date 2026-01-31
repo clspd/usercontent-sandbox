@@ -1,4 +1,5 @@
-import { HOST_BASE, TRUSTED_ORIGINS } from '../web/config.json' with { type: 'json' };
+// const { HOST_BASE, TRUSTED_ORIGINS } = await (await fetch('/__/config.json')).json();
+import { HOST_BASE, TRUSTED_ORIGINS } from '../web/__/config.json' with { type: 'json' };
 import sha256 from './sha256.js';
 export const hostname = window.location.hostname;
 export const isCorrectHostname = hostname.endsWith(HOST_BASE);
@@ -15,7 +16,7 @@ export const [specificSiteId, specificSiteHash] = isSpecificSite ? specificSiteR
 
 export const cachedDomainName2Hash = new Map();
 
-export async function getDomainHash(domainName) {
+export async function getDomainHash(domainName: string) {
     if (cachedDomainName2Hash.has(domainName)) {
         return cachedDomainName2Hash.get(domainName);
     }
@@ -24,7 +25,7 @@ export async function getDomainHash(domainName) {
     return hash;
 }
 
-export async function checkOrigin(origin, allowPublic = true) {
+export async function checkOrigin(origin: string, allowPublic = true) {
     if (isPublicSite) return allowPublic;
     if (TRUSTED_ORIGINS.includes(origin)) return true;
     if (!isSpecificSite) return false;
