@@ -12,7 +12,7 @@ export const isPublicSite = publicSiteRegex.test(prefix);
 export const publicSiteId = isPublicSite ? publicSiteRegex.exec(prefix)[1] : '';
 
 export const isSpecificSite = specificSiteRegex.test(prefix);
-export const [specificSiteId, specificSiteHash] = isSpecificSite ? specificSiteRegex.exec(prefix) : ['', ''];
+export const [, specificSiteId, specificSiteHash] = isSpecificSite ? specificSiteRegex.exec(prefix) : [, '', ''];
 
 export const cachedDomainName2Hash = new Map();
 
