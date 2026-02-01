@@ -27,13 +27,14 @@ globalThis.addEventListener('fetch', (event) => {
             }
             const cache = await caches.open(CACHE_NAME);
             const action = req.method;
+            const realpath = url.pathname.substring(6); // remove '/__/_c' prefix, keep the end /
+            const realReq = new Request(realpath, { method: 'GET' });
             if (action === 'GET') {
-                const resp = await cache.match(req);
+                const resp = await cache.match(realReq);
                 return resp ?? new Response(null, { status: 404 });
             }
             if (action === 'PUT') {
-                const cachePath = url.pathname.substring(6); // remove '/__/_c' prefix, keep the end /
-                await cache.put(req, new Response(req.body, {
+                await cache.put(realReq, new Response(req.body, {
                     headers: {
                         'Content-Type': req.headers.get('Content-Type'),
                     }
@@ -41,7 +42,7 @@ globalThis.addEventListener('fetch', (event) => {
                 return new Response(null, { status: 204 });
             }
             if (action === 'DELETE') {
-                await cache.delete(req);
+                await cache.delete(realReq);
                 return new Response(null, { status: 204 });
             }
             return new Response(null, { status: 400 });
