@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
 
 const code = ref('');
 const appmode = ref('private');
@@ -45,7 +45,11 @@ const showFrame = ref(false);
 
 onMounted(() => { 
     window.addEventListener('message', handleMessage);
-})
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('message', handleMessage);
+});
 
 watch(() => random.value, (newValue) => {
     randomBuffer.value = newValue;
@@ -158,6 +162,8 @@ const execcode = async () => {
         </div>
 
         <iframe v-if="originHash" :src="framesrc" class="myframe" :class="{ 'myframe-visible': showFrame }" ref="frame"></iframe>
+
+        <br>
     </div>
 </template>
 

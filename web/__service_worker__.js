@@ -34,7 +34,7 @@ globalThis.addEventListener('fetch', (event) => {
                 return resp ?? new Response(null, { status: 404 });
             }
             if (action === 'PUT') {
-                await cache.put(realReq, new Response(req.body, {
+                await cache.put(realReq, new Response(await req.blob(), {
                     headers: {
                         'Content-Type': req.headers.get('Content-Type'),
                     }
