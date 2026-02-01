@@ -10,7 +10,7 @@ export default defineConfig({
     rolldownOptions: {
       input: {
         main: resolve(fileURLToPath(import.meta.url), 'index.html'),
-        site: resolve(fileURLToPath(import.meta.url), 'site.html'),
+        // site: resolve(fileURLToPath(import.meta.url), 'site.html'),
       },
       external: [],
     },
