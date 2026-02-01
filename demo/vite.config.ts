@@ -1,7 +1,9 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { resolve } from 'path'
+import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -9,8 +11,8 @@ export default defineConfig({
   build: {
     rolldownOptions: {
       input: {
-        main: resolve(fileURLToPath(import.meta.url), 'index.html'),
-        // site: resolve(fileURLToPath(import.meta.url), 'site.html'),
+        main: resolve(__dirname, 'index.html'),
+        // site: resolve(__dirname, 'site.html'),
       },
       external: [],
     },
