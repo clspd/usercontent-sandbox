@@ -63,21 +63,26 @@ export async function handleMessage(event) {
 
         case 'putFile':
             try {
-                const cache = await caches.open('usercontent_storage_v1');
-                await cache.put(data.name, new Response(data.content, {
+                const { serviceWorkerWorking } = await import('../swAvailable.ts');
+                if (!await serviceWorkerWorking()) throw new Error('Service worker is not working');
+                const resp = await fetch(new Request('/__/_c/' + data.name, {
+                    method: 'PUT',
+                    body: data.content,
                     headers: {
                         'Content-Type': data.content?.type
                     }
                 }));
+                if (!resp.ok) throw new Error(`Failed to put file: ${await resp.text()}`);
                 return reply(event, {
                     type: 'putFileResult',
                     success: true,
-                    nonce: data.nonce
+                    nonce: data.nonce,
                 });
             } catch (error) {
                 return reply(event, {
                     type: 'putFileResult',
                     success: false,
+                    nonce: data.nonce,
                     reason: String(error),
                     stack: String(error?.stack)
                 });
@@ -85,7 +90,10 @@ export async function handleMessage(event) {
 
         case 'clearFiles':
             try {
-                await caches.delete('usercontent_storage_v1');
+                const { serviceWorkerWorking } = await import('../swAvailable.ts');
+                if (!await serviceWorkerWorking()) throw new Error('Service worker is not working');
+                const resp = await fetch(new Request('/__/_c/', { method: 'DELETE' }));
+                if (!resp.ok) throw new Error(`Failed to clear files: ${await resp.text()}`);
                 return reply(event, {
                     type: 'clearFilesResult',
                     success: true
