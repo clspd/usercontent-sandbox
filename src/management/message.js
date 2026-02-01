@@ -60,6 +60,44 @@ export async function handleMessage(event) {
                     stack: String(error?.stack)
                 });
             }
+
+        case 'putFile':
+            try {
+                const cache = await caches.open('usercontent_storage_v1');
+                await cache.put(data.name, new Response(data.content, {
+                    headers: {
+                        'Content-Type': data.content?.type
+                    }
+                }));
+                return reply(event, {
+                    type: 'putFileResult',
+                    success: true,
+                    nonce: data.nonce
+                });
+            } catch (error) {
+                return reply(event, {
+                    type: 'putFileResult',
+                    success: false,
+                    reason: String(error),
+                    stack: String(error?.stack)
+                });
+            }
+
+        case 'clearFiles':
+            try {
+                await caches.delete('usercontent_storage_v1');
+                return reply(event, {
+                    type: 'clearFilesResult',
+                    success: true
+                });
+            } catch (error) {
+                return reply(event, {
+                    type: 'clearFilesResult',
+                    success: false,
+                    reason: String(error),
+                    stack: String(error?.stack)
+                });
+            }
     
         default:
             break;
