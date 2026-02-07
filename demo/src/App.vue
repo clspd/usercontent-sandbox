@@ -7,6 +7,7 @@ const result = ref('');
 const random = ref('12345678'), randomBuffer = ref('12345678');
 const frame = ref<HTMLIFrameElement | null>(null);
 const originHash = ref('');
+const allowList = ref(await fetch('/demo/allowlist.txt').then(res => res.text()).catch(() => ''));
 
 const sha256 = async (message: string): Promise<string> => {
     const msgBuffer = new TextEncoder().encode(message);
@@ -161,7 +162,7 @@ const execcode = async () => {
             <label><input type="checkbox" v-model="showFrame"> Show iframe</label>
         </div>
 
-        <iframe v-if="originHash" :src="framesrc" class="myframe" :class="{ 'myframe-visible': showFrame }" ref="frame"></iframe>
+        <iframe v-if="originHash" :src="framesrc" :allow="allowList" class="myframe" :class="{ 'myframe-visible': showFrame }" ref="frame"></iframe>
 
         <br>
     </div>
