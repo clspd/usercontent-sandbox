@@ -47,8 +47,8 @@ export async function handleMessage(event) {
                 }
                 else {
                     let body;
-                    if (config.topLevelAwait) body = `return ((async function () { ${data.code} })());`;
-                    else if (config.simple) body = `return (() => ${data.code})();`;
+                    if (config.topLevelAwait) body = `return ((async function () {\n${data.code}\n})());`;
+                    else if (config.simple) body = `return (() => \n${data.code}\n)();`;
                     else body = data.code;
                     result = await (new Function(body))();
                 }
