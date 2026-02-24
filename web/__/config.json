@@ -1,6 +1,7 @@
 {
     "AUTO_REGISTER": false,
     "HOST_BASE": "usercontentsvc.clspd.top",
+    "PLATFORM_BASE": "usercontent.clspd.top",
     "USERCODE_PLATFORM": "usercontent.clspd.top/demo",
     "TRUSTED_ORIGINS": []
 }
