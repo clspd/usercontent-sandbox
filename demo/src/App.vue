@@ -26,7 +26,7 @@ const prefix = computed(() => {
     return appmode.value === 'public' ? 'public1' : (random.value + '-' + originHash.value);
 });
 const framesrc = computed(() => {
-    return `https://${prefix.value}.usercontent.clspd.top/__/usercontent.html`;
+    return `https://${prefix.value}.${globalThis.config.HOST_BASE}/__/usercontent.html`;
 });
 const frameorigin = computed(() => {
     try {
