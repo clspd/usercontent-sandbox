@@ -74,8 +74,13 @@ const updateRandom = () => {
 }
 
 const displayResult = computed(() => {
-    if (resultOptions.value === 'flatted') return stringify(result.value);
-    if (resultOptions.value === 'json') return JSON.stringify(result.value, null, 2);
+    try {
+        if (resultOptions.value === 'flatted') return stringify(result.value);
+        if (resultOptions.value === 'json') return JSON.stringify(result.value, null, 2);
+    }
+    catch (e) {
+        return `Unable to stringify the result using the specified method. Error during stringifying: ${e}\nString(result):\n${String(result.value)}`
+    }
     return String(result.value);
 })
 
