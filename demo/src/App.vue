@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
+import { stringify } from 'flatted';
 
 const code = ref('');
 const appmode = ref('private');
-const result = ref('');
+const result = ref(''), resultOptions = ref('');
 const random = ref('12345678'), randomBuffer = ref('12345678');
 const frame = ref<HTMLIFrameElement | null>(null);
 const originHash = ref('');
@@ -37,6 +38,7 @@ const frameorigin = computed(() => {
 });
 
 const config = reactive({
+    modularize: false,
     topLevelAwait: true,
     simple: false,
     unwrap: false,
@@ -71,19 +73,27 @@ const updateRandom = () => {
     random.value = randomBuffer.value;
 }
 
-
+const displayResult = computed(() => {
+    if (resultOptions.value === 'flatted') return stringify(result.value);
+    if (resultOptions.value === 'json') return JSON.stringify(result.value, null, 2);
+    return String(result.value);
+})
 
 const copyResult = async () => {
     try {
-        await navigator.clipboard.writeText(String(result.value));
+        await navigator.clipboard.writeText(displayResult.value);
     } catch (error) {
         alert('Failed to copy:' + error);
     }
 };
 
+const setSpPromise = ref<((ok: boolean) => void) | null>(null)
+
 const handleMessage = (event: MessageEvent) => {
     if (event.origin !== frameorigin.value) return;
-    if (event.data.type !== 'evaluateResult') return;
+    if (event.data.type !== 'result') return;
+    if (event.data.command === 'setSecurityPolicy') return setSpPromise.value?.(event.data.success);
+    if (event.data.command !== 'evaluate') return;
     isSuccess.value = event.data.success;
     if (event.data.success) {
         result.value = event.data.result;
@@ -92,6 +102,8 @@ const handleMessage = (event: MessageEvent) => {
     }
     isRunning.value = false;
 }
+
+const hasSetSp = ref(false);
 
 const execcode = async () => {
     try {
@@ -110,7 +122,16 @@ const execcode = async () => {
             // @ts-expect-error
             frame.value.contentWindow.postMessage({ type: 'ping' }, frameorigin.value);
         });
+        
+        if (!hasSetSp.value) if (!await new Promise<boolean>((resolve) => {
+            setSpPromise.value = resolve;
+            // @ts-expect-error
+            frame.value.contentWindow.postMessage({ type: 'setSecurityPolicy', allowEvaluate: true }, frameorigin.value);
+        })) throw new Error('Failed to set security policy');
+        hasSetSp.value = true;
 
+        isSuccess.value = true;
+        result.value = 'Executing...';
         // @ts-expect-error
         frame.value.contentWindow.postMessage({
             type: 'evaluate',
@@ -126,60 +147,77 @@ const execcode = async () => {
 </script>
 
 <template>
-    <div class="app-main">
-        <div class="app-header">
-            <b>Mode:&nbsp;</b>
-            <label><input type="radio" name="appmode" v-model="appmode" value="public"> Use public endpoint</label>
-            <label><input type="radio" name="appmode" v-model="appmode" value="private"> Use private endpoint</label>
-        </div>
-
-        <div class="random-prefix" v-if="appmode === 'private'">
-            <b>Random prefix:&nbsp;</b>
-            <input v-model="randomBuffer" type="text" @blur="updateRandom" @keyup.enter="updateRandom">
-            <button @click="random = Math.random().toString(36).substring(2, 10)">Randomalize</button>
-        </div>
-
-        <div class="input-code">
-            <b>Input the JavaScript code you want to execute:</b>
-            <textarea v-model="code"></textarea>
-        </div>
-
-        <div class="exec-settings">
-            <b>Settings:</b>
-            <label><input type="checkbox" v-model="config.topLevelAwait"> Top Level Await supports (Wrap the code in an async function)</label>
-            <label><input type="checkbox" v-model="config.simple"> Simple (Use arrow functions so that you don't need to return explicitly)</label>
-            <label><input type="checkbox" v-model="config.unwrap"> Unwrap (Directly eval instead of wrap in a function)</label>
-        </div>
-
-        <div class="exec-and-res">
-            <button @click="execcode" :disabled="!code">Execut{{ isRunning ? 'ing...' : 'e' }}</button>
-            <button @click="result = ''">Clear</button>
-            <div class="result">
-                <b>Result:</b>
-                <pre :data-err="!isSuccess">{{ String(result) }}</pre>
-                <button @click="copyResult" :disabled="!result">Copy</button>
+    <div class="app-wrapper">
+        <div class="app-main">
+            <div class="app-header">
+                <b>Mode:&nbsp;</b>
+                <label><input type="radio" name="appmode" v-model="appmode" value="public"> Use public endpoint</label>
+                <label><input type="radio" name="appmode" v-model="appmode" value="private"> Use private endpoint</label>
             </div>
+    
+            <div class="random-prefix" v-if="appmode === 'private'">
+                <b>Random prefix:&nbsp;</b>
+                <input v-model="randomBuffer" type="text" @blur="updateRandom" @keyup.enter="updateRandom">
+                <button @click="random = Math.random().toString(36).substring(2, 10)">Randomalize</button>
+            </div>
+    
+            <div class="input-code">
+                <b>Input the JavaScript code you want to execute:</b>
+                <textarea v-model="code"></textarea>
+            </div>
+    
+            <div class="exec-settings">
+                <b>Settings:</b>
+                <label><input type="checkbox" v-model="config.modularize"> Modularize (Wrap the code in ECMAScript module; you'll need to use export to return data)</label>
+                <label><input type="checkbox" v-model="config.topLevelAwait"> Top Level Await supports (Wrap the code in an async function)</label>
+                <label><input type="checkbox" v-model="config.simple"> Simple (Use arrow functions so that you don't need to return explicitly)</label>
+                <label><input type="checkbox" v-model="config.unwrap"> Unwrap (Directly eval instead of wrap in a function)</label>
+            </div>
+    
+            <div class="exec-settings">
+                <b>Output settings:</b>
+                <label><input type="radio" name="resultOptions" value="flatted" v-model="resultOptions"> Flatted stringify</label>
+                <label><input type="radio" name="resultOptions" value="json" v-model="resultOptions"> JSON stringify</label>
+                <label><input type="radio" name="resultOptions" value="" v-model="resultOptions"> No stringify (Convert to string)</label>
+            </div>
+    
+            <div class="exec-and-res">
+                <button @click="execcode" :disabled="!code">Execut{{ isRunning ? 'ing...' : 'e' }}</button>
+                <button @click="result = ''">Clear</button>
+                <div class="result">
+                    <b>Result:</b>
+                    <pre :data-err="!isSuccess">{{ (displayResult) }}</pre>
+                    <button @click="copyResult" :disabled="!result">Copy</button>
+                </div>
+            </div>
+    
+            <div class="frame-toggle">
+                <label><input type="checkbox" v-model="showFrame"> Show iframe</label>
+            </div>
+    
+            <iframe v-if="originHash && allowListLoaded" :src="framesrc" :allow="allowList" class="myframe" :class="{ 'myframe-visible': showFrame }" ref="frame"></iframe>
+    
+            <div v-if="showFrame" style="height: 100vh;">&NoBreak;</div>
         </div>
-
-        <div class="frame-toggle">
-            <label><input type="checkbox" v-model="showFrame"> Show iframe</label>
-        </div>
-
-        <iframe v-if="originHash && allowListLoaded" :src="framesrc" :allow="allowList" class="myframe" :class="{ 'myframe-visible': showFrame }" ref="frame"></iframe>
-
-        <br>
     </div>
 </template>
 
 <style scoped>
-.app-main {
+.app-wrapper {
     position: absolute;
     inset: 0;
+    overflow: auto;
+}
+
+.app-main {
     display: flex;
     flex-direction: column;
-    padding: 16px;
-    gap: 12px;
-    font-family: system-ui, -apple-system, sans-serif;
+    gap: 0.5em;
+    padding: 10px;
+}
+
+.app-main > * {
+    overflow: auto;
 }
 
 .app-header {

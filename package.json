@@ -15,7 +15,6 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@types/mime-types": "^3.0.1",
     "esbuild": "0.25.12",
     "only-allow": "^1.2.2",
     "typescript": "~5.9.3",
@@ -30,7 +29,6 @@
     ]
   },
   "dependencies": {
-    "fflate": "^0.8.2",
-    "mime-types": "^3.0.2"
+    "flatted": "^3.3.3"
   }
 }

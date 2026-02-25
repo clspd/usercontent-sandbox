@@ -11,6 +11,9 @@ importers:
 
   .:
     dependencies:
+      flatted:
+        specifier: ^3.3.3
+        version: 3.3.3
       vue:
         specifier: ^3.5.24
         version: 3.5.27(typescript@5.9.3)
@@ -258,6 +261,9 @@ packages:
     peerDependenciesMeta:
       picomatch:
         optional: true
+
+  flatted@3.3.3:
+    resolution: {integrity: sha512-GX+ysw4PBCz0PzosHDepZGANEuFCMLrnRTiEy9McGjmkCQYwRq4A/X786G/fjM/+OjsWSU1ZrY5qyARZmO/uwg==}
 
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
@@ -645,6 +651,8 @@ snapshots:
   fdir@6.5.0(picomatch@4.0.3):
     optionalDependencies:
       picomatch: 4.0.3
+
+  flatted@3.3.3: {}
 
   fsevents@2.3.3:
     optional: true
