@@ -197,7 +197,6 @@ const execcode = async () => {
     
             <iframe v-if="originHash && allowListLoaded" :src="framesrc" :allow="allowList" class="myframe" :class="{ 'myframe-visible': showFrame }" ref="frame"></iframe>
     
-            <div v-if="showFrame" style="height: 100vh;">&NoBreak;</div>
         </div>
     </div>
 </template>
@@ -415,9 +414,10 @@ const execcode = async () => {
 .myframe {
     display: none;
     width: 100%;
-    height: 400px;
+    height: calc(100vh - 2em);
     border: 1px solid #e5e7eb;
     border-radius: 8px;
+    box-sizing: border-box;
 }
 
 .myframe-visible {
