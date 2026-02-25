@@ -1,5 +1,5 @@
 ((async function () {
-    const { HOST_BASE, USERCODE_PLATFORM } = await (await fetch('/__/config.json')).json();
+    const { HOST_BASE, PLATFORM_BASE, USERCODE_PLATFORM } = await (await fetch('/__/config.json')).json();
     const { hostname, pathname } = window.location;
     if (!hostname.endsWith(HOST_BASE) && !hostname.endsWith(PLATFORM_BASE)) {
         window.document.body.appendChild(window.document.createElement('h1')).innerHTML = "Error: Invalid Hostname";
