@@ -172,6 +172,7 @@ const execcode = async () => {
                 <label><input type="checkbox" v-model="config.topLevelAwait"> Top Level Await supports (Wrap the code in an async function)</label>
                 <label><input type="checkbox" v-model="config.simple"> Simple (Use arrow functions so that you don't need to return explicitly)</label>
                 <label><input type="checkbox" v-model="config.unwrap"> Unwrap (Directly eval instead of wrap in a function)</label>
+                <label v-if="!hasSetSp"><input type="checkbox" v-model="hasSetSp" :disabled="hasSetSp"> Ignore security policy</label>
             </div>
     
             <div class="exec-settings">
