@@ -10,7 +10,7 @@
     if (!host_prefix || host_prefix === 'www.') {
         if (isEmbedded) {
             // // Randomly pick a subdomain for embedding
-            const r = (Math.random() * 1e10) % 10; // 0-9
+            const r = Math.floor((Math.random() * 1e10) % 10); // 0-9
             window.location.href = `https://public${r}.${HOST_BASE}/usercontent.html#${pathname}`;
         }
         else {
